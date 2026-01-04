@@ -1,7 +1,9 @@
 "use client";
 
+import Script from "next/script";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
+
 
 /* --------------------------------
    Helpers
@@ -43,16 +45,19 @@ export default function PaymentsPage() {
   /* --------------------------------
      Paystack Init
   --------------------------------- */
-  function startPayment() {
-  if (typeof window === "undefined" || !(window as any).PaystackPop) {
-    alert("Payment service not ready. Please refresh and try again.");
+function startPayment() {
+  if (typeof window === "undefined") return;
+
+  const PaystackPop = (window as any).PaystackPop;
+  if (!PaystackPop) {
+    alert("Payment service not loaded yet. Please wait and try again.");
     return;
   }
 
-  const handler = (window as any).PaystackPop.setup({
-    key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-    email: "client@example.com",
-    amount: amount * 100,
+  const handler = PaystackPop.setup({
+    key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
+    email: "client@example.com", // replace later
+    amount: amount * 100, // Kobo
     currency: "NGN",
     ref: `HW-${Date.now()}`,
     callback: (response: any) => {
@@ -61,7 +66,7 @@ export default function PaymentsPage() {
   });
 
   handler.openIframe();
-  }
+}
 
 async function verifyPayment(reference: string) {
   const res = await fetch("/api/payments/paystack/verify", {
@@ -93,8 +98,13 @@ async function verifyPayment(reference: string) {
     return <p className="p-10">Invalid payment session.</p>;
   }
 
-  return (
-    <main>
+ return (
+  <main>
+    <Script
+      src="https://js.paystack.co/v1/inline.js"
+      strategy="afterInteractive"
+    />
+
       {/* HERO */}
       <section className="section bg-brand-dark text-white relative overflow-hidden">
         <div className="container-max relative z-10">
