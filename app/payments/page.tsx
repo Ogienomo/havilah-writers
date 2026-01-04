@@ -63,21 +63,28 @@ export default function PaymentsPage() {
   handler.openIframe();
   }
 
-  async function verifyPayment(reference: string) {
-    await fetch("/api/payments/paystack/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        reference,
-        expectedAmount: amount,
-        programme,
-        package: pkg,
-        requirements,
-      }),
-    });
+async function verifyPayment(reference: string) {
+  const res = await fetch("/api/payments/paystack/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      reference,
+      expectedAmount: amount,
+      programme,
+      package: pkg,
+      requirements,
+    }),
+  });
 
-    alert("Payment submitted. Verification in progress.");
+  const data = await res.json();
+
+  if (data.success && data.invoiceId) {
+    localStorage.setItem("havilahInvoiceId", data.invoiceId);
+    window.location.href = "/portal";
+  } else {
+    alert("Payment verification failed.");
   }
+}
 
   /* --------------------------------
      Guard Clause

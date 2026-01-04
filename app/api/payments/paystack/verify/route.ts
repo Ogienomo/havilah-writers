@@ -1,38 +1,65 @@
 import { NextResponse } from "next/server";
+import { createInvoice } from "../../../../lib/invoices/store";
 
 export async function POST(req: Request) {
-  const { reference, expectedAmount } = await req.json();
+  try {
+    const body = await req.json();
+    const { reference, expectedAmount, programme, package: pkg, requirements } = body;
 
-  const res = await fetch(
-    `https://api.paystack.co/transaction/verify/${reference}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-      },
+    if (!reference || !expectedAmount) {
+      return NextResponse.json(
+        { error: "Missing payment reference or amount" },
+        { status: 400 }
+      );
     }
-  );
 
-  const data = await res.json();
+    // 🔐 Verify with Paystack
+    const verifyRes = await fetch(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
 
-  if (!data.status) {
-    return NextResponse.json({ error: "Verification failed" }, { status: 400 });
-  }
+    const verifyData = await verifyRes.json();
 
-  const paidAmount = data.data.amount / 100;
+    if (!verifyData.status) {
+      return NextResponse.json(
+        { error: "Paystack verification failed" },
+        { status: 400 }
+      );
+    }
 
-  if (paidAmount !== expectedAmount) {
+    const paidAmount = verifyData.data.amount / 100; // Kobo → NGN
+
+    if (paidAmount !== expectedAmount) {
+      return NextResponse.json(
+        { error: "Payment amount mismatch" },
+        { status: 400 }
+      );
+    }
+
+    // 🧾 Create invoice (SERVER SIDE ONLY)
+    const invoice = createInvoice({
+      programme,
+      package: pkg,
+      amount: paidAmount,
+      reference,
+      requirements,
+      status: "paid",
+    });
+
+    // ✅ Return data to client — NO browser logic here
+    return NextResponse.json({
+      success: true,
+      invoiceId: invoice.id,
+    });
+  } catch (error) {
     return NextResponse.json(
-      { error: "Amount mismatch" },
-      { status: 400 }
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
-
-  // TODO: save invoice, requirements, payment status to DB
-
-  return NextResponse.json({ success: true });
 }
-// After successful Paystack verification
-localStorage.setItem("havilahInvoiceId", invoiceId);
-
-// Redirect client
-window.location.href = "/portal";
