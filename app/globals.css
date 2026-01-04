@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   ROOT VARIABLES — BRAND SYSTEM
+========================================================= */
+
+:root {
+  --color-dark: #0f172a;
+  --color-gold: #c9a24d;
+  --color-soft: #f8fafc;
+  --color-muted: #475569;
+  --color-line: #e2e8f0;
+
+  --radius-soft: 12px;
+  --radius-round: 18px;
+
+  --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-gold: 0 12px 28px rgba(201, 162, 77, 0.25);
+}
+
+/* =========================================================
+   BASE RESET
+========================================================= */
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-soft);
+  color: var(--color-dark);
+  font-family: "Inter", system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Playfair Display", serif;
+  letter-spacing: -0.015em;
+}
+
+p {
+  color: var(--color-muted);
+}
+
+/* =========================================================
+   COMPONENT CLASSES (NO max-w APPLY)
+========================================================= */
+
+@layer components {
+  .container-max {
+    max-width: 1280px; /* replaces max-w-7xl safely */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-dark);
+    color: white;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    box-shadow: var(--shadow-gold);
+    transform: translateY(-1px);
+  }
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade {
+    animation: fadeUp 1.2s ease-out forwards;
+  }
+
+  .text-muted {
+    color: var(--color-muted);
+  }
+}
+
+/* =========================================================
+   DARK MODE (OPTIONAL)
+========================================================= */
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #020617;
+    color: #e5e7eb;
+  }
+
+  p {
+    color: #cbd5f5;
+  }
+}

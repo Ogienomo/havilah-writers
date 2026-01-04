@@ -1,0 +1,7 @@
+{
+  "invoiceId": "INV-2026-00123",
+  "status": "PAID",
+  "amount": 150000,
+  "programme": "nigeria",
+  "package": "msc_research"
+}
