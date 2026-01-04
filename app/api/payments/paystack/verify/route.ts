@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createInvoice } from "../../../../lib/invoices/store";
+import { createInvoice } from "../../../../../lib/invoices/store";
 
 export async function POST(req: Request) {
   try {
@@ -42,14 +42,7 @@ export async function POST(req: Request) {
     }
 
     // 🧾 Create invoice (SERVER SIDE ONLY)
-    const invoice = createInvoice({
-      programme,
-      package: pkg,
-      amount: paidAmount,
-      reference,
-      requirements,
-      status: "paid",
-    });
+    const invoice = createInvoice(programme, paidAmount);
 
     // ✅ Return data to client — NO browser logic here
     return NextResponse.json({
